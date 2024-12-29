@@ -60,7 +60,7 @@ func NewImager() *Imager {
 func (i Imager) extractImages(ctx context.Context, chart *chart.Chart) ([]string, error) {
 	release, err := i.client.RunWithContext(ctx, chart, map[string]interface{}{})
 	if err != nil {
-		return nil, fmt.Errorf("Error rendering templates: %v", err)
+		return nil, fmt.Errorf("Error rendering templates: %w", err)
 	}
 
 	reader := strings.NewReader(release.Manifest)
@@ -76,7 +76,7 @@ func (i Imager) extractImages(ctx context.Context, chart *chart.Chart) ([]string
 				break
 			}
 
-			return nil, fmt.Errorf("Failed to decode manifest: %v", err)
+			return nil, fmt.Errorf("Failed to decode manifest: %w", err)
 		}
 
 		obj, _, err := scheme.Codecs.UniversalDeserializer().Decode(rawObj.Raw, nil, nil)
@@ -105,23 +105,22 @@ func (i Imager) extractImages(ctx context.Context, chart *chart.Chart) ([]string
 func (i Imager) getImageDetails(_ context.Context, containerImage string) (*ImageDetails, error) {
 	ref, err := name.ParseReference(containerImage)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse image reference: %v", err)
-
+		return nil, fmt.Errorf("failed to parse image reference: %w", err)
 	}
 
 	image, err := remote.Image(ref)
 	if err != nil {
-		return nil, fmt.Errorf("failed to pull image: %v", err)
+		return nil, fmt.Errorf("failed to pull image: %w", err)
 	}
 
 	layers, err := image.Layers()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get image layers: %v", err)
+		return nil, fmt.Errorf("failed to get image layers: %w", err)
 	}
 
 	size, err := image.Size()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get image size: %v", err)
+		return nil, fmt.Errorf("failed to get image size: %w", err)
 	}
 
 	details := ImageDetails{
@@ -137,18 +136,17 @@ func (i Imager) getImageDetails(_ context.Context, containerImage string) (*Imag
 func (i Imager) GetChartImagesDetails(ctx context.Context, chartURL string) ([]*ImageDetails, error) {
 	chartPath, err := i.client.ChartPathOptions.LocateChart(chartURL, settings)
 	if err != nil {
-		return nil, fmt.Errorf("failed to locate chart from provided path: %v", err)
+		return nil, fmt.Errorf("failed to locate chart from provided path: %w", err)
 	}
 
 	chart, err := loader.Load(chartPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load chart: %v", err)
-
+		return nil, fmt.Errorf("failed to load chart: %w", err)
 	}
 
 	containerImages, err := i.extractImages(ctx, chart)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get images from chart: %v", err)
+		return nil, fmt.Errorf("failed to get images from chart: %w", err)
 	}
 
 	if len(containerImages) == 0 {
@@ -164,7 +162,7 @@ func (i Imager) GetChartImagesDetails(ctx context.Context, chartURL string) ([]*
 	for _, containerImage := range containerImages {
 		imageInfo, err := i.getImageDetails(ctx, containerImage)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get images from main chart: %v", err)
+			return nil, fmt.Errorf("failed to get images from main chart: %w", err)
 		}
 
 		images = append(images, imageInfo)

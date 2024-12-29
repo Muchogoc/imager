@@ -26,9 +26,9 @@ func main() {
 						return cli.Exit("Expected a link to a helm chart", 1)
 					}
 
-					chartUrl := cCtx.Args().First()
+					chartURL := cCtx.Args().First()
 
-					images, err := i.GetChartImagesDetails(cCtx.Context, chartUrl)
+					images, err := i.GetChartImagesDetails(cCtx.Context, chartURL)
 					if err != nil {
 						return cli.Exit(err.Error(), 1)
 					}
