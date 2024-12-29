@@ -1,0 +1,53 @@
+# Options for analysis running.
+run:
+  timeout: 3m
+  concurrency: 8
+
+issues:
+  exclude-dirs:
+    - pkg/mycarehub/presentation/graph/
+    - ./tests/
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - asciicheck
+    - dogsled
+    - goheader
+    - unused
+    - misspell
+    - rowserrcheck
+    - sqlclosecheck
+    - revive
+    - funlen
+    - gofmt
+    - unparam
+    - errorlint
+    - bodyclose
+    - gocritic
+    - nilerr
+    - ireturn
+    - importas
+    - wsl
+    - copyloopvar
+    - nilerr
+    - makezero
+    - reassign
+
+linters-settings:
+  staticcheck:
+    checks: ["all"]
+  funlen:
+    lines: -1
+    statements: -1
+  gosec:
+    excludes:
+      - G601
+      - G304
+      - G101

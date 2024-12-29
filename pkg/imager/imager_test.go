@@ -9,11 +9,11 @@ import (
 )
 
 func TestImager_GetChartImagesDetails(t *testing.T) {
-
 	type args struct {
 		ctx      context.Context
 		chartURL string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -63,11 +63,13 @@ func TestImager_GetChartImagesDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			i := imager.NewImager()
+
 			got, err := i.GetChartImagesDetails(tt.args.ctx, tt.args.chartURL)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Imager.GetChartImagesDetails() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Imager.GetChartImagesDetails() = %v, want %v", got, tt.want)
 			}
