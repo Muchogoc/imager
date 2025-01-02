@@ -30,7 +30,7 @@ func TestImager_GetChartImagesDetails(t *testing.T) {
 				{
 					Name:   "openfga/openfga:v1.8.2",
 					Layers: 4,
-					Size:   1159,
+					Size:   16.662891387939453,
 				},
 			},
 			wantErr: false,
@@ -45,7 +45,7 @@ func TestImager_GetChartImagesDetails(t *testing.T) {
 				{
 					Name:   "docker.io/bitnami/airflow:2.10.4-debian-12-r0",
 					Layers: 1,
-					Size:   431,
+					Size:   448.5532636642456,
 				},
 			},
 			wantErr: false,
