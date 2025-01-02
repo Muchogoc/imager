@@ -12,6 +12,7 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/chartutil"
 	helmcli "helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
 	appsv1 "k8s.io/api/apps/v1"
@@ -21,12 +22,17 @@ import (
 	"k8s.io/kubectl/pkg/scheme"
 )
 
-var settings = helmcli.New()
+var (
+	settings = helmcli.New()
+
+	k8sVersionMajor = "1"
+	k8sVersionMinor = "30"
+)
 
 type ImageDetails struct {
 	Name   string
 	Layers int
-	Size   int
+	Size   float64
 }
 
 type Imager struct {
@@ -42,6 +48,15 @@ func NewImager() *Imager {
 	}
 
 	cfg.RegistryClient = registryClient
+
+	capabilities := chartutil.DefaultCapabilities
+	capabilities.KubeVersion = chartutil.KubeVersion{
+		Version: fmt.Sprintf("v%s.%s.0", k8sVersionMajor, k8sVersionMinor),
+		Major:   k8sVersionMajor,
+		Minor:   k8sVersionMinor,
+	}
+
+	cfg.Capabilities = capabilities
 
 	client := action.NewInstall(cfg)
 	client.DryRun = true
@@ -118,15 +133,22 @@ func (i Imager) getImageDetails(_ context.Context, containerImage string) (*Imag
 		return nil, fmt.Errorf("failed to get image layers: %w", err)
 	}
 
-	size, err := image.Size()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get image size: %w", err)
+	// add up the layers
+	totalSize := int64(0)
+
+	for _, layer := range layers {
+		size, err := layer.Size()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get image layer size: %w", err)
+		}
+
+		totalSize += size
 	}
 
 	details := ImageDetails{
 		Name:   containerImage,
 		Layers: len(layers),
-		Size:   int(size),
+		Size:   (float64(totalSize) / (1024 * 1024)), // output in mbs
 	}
 
 	return &details, nil

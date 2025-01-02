@@ -34,7 +34,7 @@ func main() {
 					}
 
 					for _, imager := range images {
-						fmt.Printf("Name: %s\tLayers: %d\tSize: %d\n", imager.Name, imager.Layers, imager.Size)
+						fmt.Printf("Name: %s\tLayers: %d\tSize: %f\n", imager.Name, imager.Layers, imager.Size)
 					}
 
 					return nil
